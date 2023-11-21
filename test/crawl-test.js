@@ -20,21 +20,37 @@ describe('getUrlsFromHtml', function () {
         const htmlBody = `
             <html>
                 <body>
-                    <a href="https://www.google.com">Google</a>
-                    <a href="http://www.google.com/">Google</a>
-                    <a href="https://blog.boot.dev/path/">Blog</a>
-                    <a href="http://Blog.boot.dev/path">Blog</a>
                     <a href="/xyz.html">Blog</a>
+                    <a href="/xyzy.html">Blog</a>
+                    <a href="https://www.boot.dev.pl">Blog</a>
                 </body>
             </html>
         `;
         const baseURL = "https://www.google.com";
         const urls = getUrlsFromHtml(htmlBody, baseURL);
-        assert.strictEqual(5, urls.length);
-        assert.strictEqual("google.com", urls[0]);
-        assert.strictEqual("google.com", urls[1]);
-        assert.strictEqual("blog.boot.dev/path", urls[2]);
-        assert.strictEqual("blog.boot.dev/path", urls[3]);
-        assert.strictEqual("google.com/xyz.html", urls[4]);
+        assert.strictEqual(3, urls.length);
+        assert.strictEqual("https://www.google.com/xyz.html", urls[0]);
+        assert.strictEqual("https://www.google.com/xyzy.html", urls[1]);
+        assert.strictEqual("https://www.boot.dev.pl/", urls[2]);
     });
+    
 });
+
+describe('notGettingInvalidUrls', function () {
+    it('should not return invalid URLs', function () {
+        const htmlBody = `
+            <html>
+                <body>
+                    <a href="http//www.google.com">Google</a>
+                    <a href="invALID">Blog</a>
+                    <a href="invALID">Blog</a>
+                    <a href="invALID">Blog</a>
+                </body>
+            </html>
+        `;
+        const baseURL = "https://www.google.com";
+        const urls = getUrlsFromHtml(htmlBody, baseURL);
+        assert.strictEqual(0, urls.length);
+    }
+    );
+});    
